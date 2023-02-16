@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chart Example</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+  </head>
+  <body>
+    <div id="chart"></div>
+    <script>
+      // Initial chart 
+
+        function updateChart() {
+        // Get the data from Firebase
+        fetch('https://maxim-83cfc.firebaseio.com/.json')
+          .then(response => response.json())
+          .then(data => {
+            // Filter out data that's older than 24 hours
+            const currentDate = new Date();
+            const cutoffDate = new Date(currentDate.getTime() - (24 * 60 * 60 * 1000));
+            const filteredData = Object.keys(data.Data).filter(date => {
+              const dataDate = new Date(date);
+              return dataDate >= cutoffDate;
+            });
+
+            // Extract hour:minute from each date in the filtered data
+            const minuteCounts = {};
+            filteredData.forEach(date => {
+              const entries = data.Data[date];
+              Object.keys(entries).forEach(key => {
+                const time = entries[key];
+                const minute = time.split(':').slice(0, 2).join(':');
+                const count = minuteCounts[minute] || 0;
+                minuteCounts[minute] = count + 1;
+              });
+            });
+
+            // Convert minute counts to an array of objects
+            const chartData = Object.keys(minuteCounts).map(minute => {
+              return { minute, count: minuteCounts[minute] };
+            });
+
+            // Log the chart data to the console
+            console.log(chartData);
+
+            const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+            const width = 600 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+
+            // Set the x and y scales
+            const x = d3.scaleBand()
+              .range([0, width])
+              .padding(0.1);
+
+            const y = d3.scaleLinear()
+              .range([height, 0]);
+
+              // Create the chart SVG element
+              const svg = d3.select('#chart')
+                .select('svg');
+              
+              if (!svg.empty()) {
+                svg.remove();
+              }
+
+            // Create the chart SVG element
+            const newSvg = d3.select('#chart')
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+            // Set the x and y domain values
+            x.domain(chartData.map(d => d.minute));
+            y.domain([0, d3.max(chartData, d => d.count)]);
+
+            // Add the x-axis to the chart
+            newSvg.append('g')
+              .attr('transform', 'translate(0,' + height + ')')
+              .call(d3.axisBottom(x));
+
+            // Add the y-axis to the chart
+            newSvg.append('g')
+              .call(d3.axisLeft(y));
+
+            // Add the bars to the chart
+            newSvg.selectAll('.bar')
+              .data(chartData)
+              .enter()
+              .append('rect')
+              .attr('class', 'bar')
+              .attr('x', d => x(d.minute))
+              .attr('y', d => y(d.count))
+              .attr('width', x.bandwidth())
+              .attr('height', d => height - y(d.count));
+        });
+        }
+      updateChart(); 
+      setInterval(updateChart,2000);
+    </script>
+  </body>
+</html>

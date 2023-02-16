@@ -1,0 +1,141 @@
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="shortcut icon" href="http://www.freeiconspng.com/uploads/push-button-icon-png-2.png">
+<title>The Button</title>
+<link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script>
+	$("btn").click(function(e) {
+	    e.preventDefault();
+	    $.ajax({
+	        type: "POST",
+	        url: "/maxim/buttonresult.html",
+	        data: { 
+	            id: $(this).val(), // < note use of 'this' here
+	            access_token: $("#access_token").val() 
+	        },
+	        success: function(result) {
+	            alert('ok');
+	        },
+	        error: function(result) {
+	            alert('error');
+	        }
+	    });
+	});
+</script>
+<style>
+	.wrapper {
+	    text-align: center;}
+		body{
+		font-family: 'Nunito', sans-serif;
+	font-size: 11pt;
+	background: #fff;
+	color: #333;
+		}
+	button {
+	  -webkit-border-radius: 4;
+	  -moz-border-radius: 4;
+	  border-radius: 4px;
+	  border-width: 0px;
+	  color: #ffffff;
+	  font-size: 32px;
+	  background: #f53b3b;
+	  padding: 14px 25px 14px 25px;
+	  width: 400px;
+	  text-decoration: none;
+	}
+	
+	button:hover {
+	  background: #d6202f;
+	  text-decoration: none;
+	}
+	
+	button:disabled,
+	button[disabled]{
+	  border: 1px solid #999999;
+	  background-color: #cccccc;
+	  color: #666666;
+	}
+	.myClass{ 
+		-webkit-border-radius: 4;
+	  -moz-border-radius: 4;
+	  border-radius: 4px;
+	  border-width: 0px;
+	  color: #000;
+	  font-size: 14px;
+	  background: #fff;
+	  padding: 14px 25px 14px 25px;
+	  width: 300px;
+	  text-decoration: none;
+		
+	}
+	h1{ 
+		font-family: inherit;
+		    font-weight: 500;
+		    line-height: 1.1;
+		    color: inherit;
+		}
+	</style>
+<body><BR><BR><BR><center>
+		<table width="80%" cellpadding="20px" bgcolor="#fff"><tr><td text-align="left;"><h1>CLASS: Maxim Massenkoff</h1>If you're confused at any point in the lecture, click the button below. Maxim will receive an anonymous notification that the material needs further explanation. You can click the button every 30 seconds (the button will become red again when 30 seconds have passed since your most recent click).<BR><BR><BR><BR><BR>
+		<div class="wrapper">
+	<button id="submit" onclick="submitClick()"><i class="fa fa-arrow-right" aria-hidden="true"></i>I'm confused</button>		
+</div>
+
+<script type='text/javascript'>//<![CDATA[
+
+$(window).load(function(){
+
+$(function() {
+    $("button").click(function() {
+		$("button").text('Letting Maxim know...'); 
+        $("button").attr("disabled", "disabled");
+        setTimeout(function() {
+			$("button").text('I am confused again!');
+            $("button").removeAttr("disabled");      
+        }, 30000);
+    });
+});
+});//]]>
+
+
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyB3tPlA4D6DB_p1m1Q5ZVS6zQmqfsv9ZU4",
+		authDomain: "maxim-83cfc.firebaseapp.com",
+		databaseURL: "https://maxim-83cfc.firebaseio.com",
+		projectId: "maxim-83cfc",
+		storageBucket: "maxim-83cfc.appspot.com",
+		messagingSenderId: "611688048290",
+		appId: "1:611688048290:web:78a210291d6e11176d59fb"
+  };
+  firebase.initializeApp(firebaseConfig);
+</script>
+<script src="https://gist.githubusercontent.com/fosslien/24cfea32f5b67a4f21349df80ac47e47/raw/8e690214174aa99053414d097168d15c32d69943/index.js"></script>
+
+<script type="text/javascript">
+var maxim = document.getElementById("maxim");
+var submit = document.getElementById("submit");
+		
+var time_line = [];
+var d = new Date();
+var today_key = d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+
+function submitClick() {
+	
+	read_data(today_key);
+}
+
+
+function read_data(key_val){
+	var time_line_Ref = firebase.database().ref('Data/'+key_val);
+	var d = new Date();
+	time_line_Ref.push(d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+":"+d.getMilliseconds());
+}	
+</script>
+  </body>
+      
+</html>
